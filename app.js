@@ -45,5 +45,5 @@ app.post('/vote', routes.vote);
 io.sockets.on('connection', routes.vote);
 
 server.listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
+    console.log('Express server listening on port ' + app.get('port'));
 });

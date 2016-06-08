@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 var voteSchema = new mongoose.Schema({ ip: 'String' });
 
 // Subdocument schema for poll choices
-var choiceSchema = new mongoose.Schema({ 
+var choiceSchema = new mongoose.Schema({
 	text: String,
 	votes: [voteSchema]
 });
@@ -12,6 +12,6 @@ var choiceSchema = new mongoose.Schema({
 // Document schema for polls
 exports.PollSchema = new mongoose.Schema({
 	question: { type: String, required: true },
-	enddate: { type: Date, required: true },
+	enddate: { type: Date, required: true, min: Date.now },
 	choices: [choiceSchema]
 });
