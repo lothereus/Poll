@@ -24,7 +24,7 @@ function PollItemCtrl($scope, $routeParams, socket, Poll) {
 	
 	$scope.vote = function() {
 		var pollId = $scope.poll._id,
-				choiceId = $scope.poll.userVote;
+			choiceId = $scope.poll.userVote;
 		
 		if(choiceId) {
 			var voteObj = { poll_id: pollId, choice: choiceId };
@@ -40,6 +40,7 @@ function PollNewCtrl($scope, $location, Poll) {
 	// Define an empty poll model object
 	$scope.poll = {
 		question: '',
+		enddate: '',
 		choices: [ { text: '' }, { text: '' }, { text: '' }]
 	};
 	

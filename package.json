@@ -5,6 +5,8 @@
   "scripts": {
     "start": "node app.js"
   },
+  "repository": "https://github.com/lothereus/Poll",
+  "license": "MIT",
   "dependencies": {
     "body-parser": "^1.5.2",
     "express": "^4.8.0",

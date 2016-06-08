@@ -67,7 +67,7 @@ exports.create = function(req, res) {
 			// Filter out choices with empty text
 			choices = reqBody.choices.filter(function(v) { return v.text != ''; }),
 			// Build up poll object to save
-			pollObj = {question: reqBody.question, choices: choices};
+			pollObj = {question: reqBody.question, enddate: reqBody.endddate, choices: choices};
 				
 	// Create poll model from built up poll object
 	var poll = new Poll(pollObj);
@@ -75,7 +75,7 @@ exports.create = function(req, res) {
 	// Save poll to DB
 	poll.save(function(err, doc) {
 		if(err || !doc) {
-			throw 'Error';
+			throw 'Error: '+err;
 		} else {
 			res.json(doc);
 		}		
