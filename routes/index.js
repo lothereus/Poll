@@ -9,13 +9,15 @@ var Poll = db.model('polls', PollSchema);
 
 // Main application view
 exports.index = function(req, res) {
+    console.log("index.js:index");
 	res.render('index');
 };
 
 // JSON API for list of polls
 exports.list = function(req, res) {
 	// Query Mongo for polls, just get back the question text
-	Poll.find({}, 'question', function(error, polls) {
+	Poll.find({}, 'question enddate', function(error, polls) {
+        console.log("index.js:list: "+JSON.stringify(polls));
 		res.json(polls);
 	});
 };
