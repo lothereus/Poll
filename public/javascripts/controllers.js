@@ -1,7 +1,7 @@
 // Controller for the poll list
 function PollListCtrl($scope, Poll) {
-	$scope.polls = Poll.query();
     console.log("controller.js:list");
+	$scope.polls = Poll.query();
 }
 
 // Controller for an individual poll

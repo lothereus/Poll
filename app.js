@@ -10,6 +10,7 @@ var logger = require('morgan');
 var methodOverride = require('method-override');
 var bodyParser = require('body-parser');
 var multer = require('multer');
+var moment = require('moment');
 
 var app = express();
 var server = http.createServer(app);

@@ -1,3 +1,8 @@
+// Set moment for date manipulation
+var package = require('../package.json');
+var moment = require('moment');
+moment.locale(package.locale);
+
 // Connect to MongoDB using Mongoose
 var mongoose = require('mongoose');
 var db;
@@ -15,9 +20,10 @@ exports.index = function(req, res) {
 
 // JSON API for list of polls
 exports.list = function(req, res) {
+    console.log("index.js:list");
 	// Query Mongo for polls, just get back the question text
 	Poll.find({}, 'question enddate', function(error, polls) {
-        console.log("index.js:list: "+JSON.stringify(polls));
+        console.log(JSON.stringify(polls));
 		res.json(polls);
 	});
 };
@@ -31,8 +37,8 @@ exports.poll = function(req, res) {
 	Poll.findById(pollId, '', { lean: true }, function(err, poll) {
 		if(poll) {
 			var userVoted = false,
-                            userChoice,
-                            totalVotes = 0;
+                userChoice,
+                totalVotes = 0;
 
 			// Loop through poll choices to determine if user has voted
 			// on this poll, and if so, what they selected
@@ -65,15 +71,30 @@ exports.poll = function(req, res) {
 
 // JSON API for creating a new poll
 exports.create = function(req, res) {
-	var reqBody = req.body,
-			// Filter out choices with empty text
-			choices = reqBody.choices.filter(function(v) { return v.text != ''; }),
-			// Build up poll object to save
-			pollObj = {
-                question: reqBody.question,
-                enddate: Date.parse(reqBody.enddate),
-                choices: choices
-            };
+	var reqBody = req.body;
+
+    // Filter out choices with empty text
+    var choices = reqBody.choices.filter(function(v) { return v.text != ''; });
+
+    // Filter date
+    console.log(moment("30/06/2016").isValid());
+    /*if (!moment("30/06/2016").isValid()) {
+        console.log("HERE IN");
+        var momentdate = moment("30/06/2016", "DD/MM/YYYY");
+        reqBody.enddate = momentdate.format("YYYY-MM-DD");
+    }*/
+    console.log("THERE OUT");
+
+    var date = Date.parse(reqBody.enddate);
+    console.log(date.toString());
+
+/*
+    // Build up poll object to save
+    var pollObj = {
+        question: reqBody.question,
+        enddate: Date.parse(reqBody.enddate),
+        choices: choices
+    };
 
 	// Create poll model from built up poll object
 	var poll = new Poll(pollObj);
@@ -85,12 +106,16 @@ exports.create = function(req, res) {
 		} else {
 			res.json(doc);
 		}
-	});
+	});*/
 };
 
 exports.vote = function(socket) {
 	socket.on('send:vote', function(data) {
 		var ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address;
+
+        console.log("SHH: "+socket.handshake.headers['x-forwarded-for']);
+        console.log("SHA: "+socket.handshake.address.address);
+        console.log("SRCRA: "+socket.request.connection.remoteAddress);
 
 		Poll.findById(data.poll_id, function(err, poll) {
 			var choice = poll.choices.id(data.choice);
