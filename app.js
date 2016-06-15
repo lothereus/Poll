@@ -10,7 +10,10 @@ var logger = require('morgan');
 var methodOverride = require('method-override');
 var bodyParser = require('body-parser');
 var multer = require('multer');
+// Set moment for date manipulation
+var package = require('./package.json');
 var moment = require('moment');
+moment.locale(package.locale);
 
 var app = express();
 var server = http.createServer(app);

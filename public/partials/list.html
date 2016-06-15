@@ -18,7 +18,7 @@
     </ul>
     <ul ng-switch-default>
         <li ng-repeat="poll in polls | filter:query">
-            <div class="col-xs-6"><a href="#/poll/{{poll._id}}">{{poll.question}}</a></div><div class="col-xs-6"> - fin: {{poll.enddate|date:"fullDate"}}</div>
+            <div class="col-xs-6"><a href="#/poll/{{poll._id}}">{{poll.question}}</a></div><div class="col-xs-6"> - fin: {{poll.enddate | moment:'LL'}}</div>
         </li>
     </ul>
 </div>

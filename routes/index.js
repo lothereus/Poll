@@ -23,13 +23,14 @@ exports.list = function(req, res) {
     console.log("index.js:list");
 	// Query Mongo for polls, just get back the question text
 	Poll.find({}, 'question enddate', function(error, polls) {
-        console.log(JSON.stringify(polls));
+        console.log("Polls: "+JSON.stringify(polls));
 		res.json(polls);
 	});
 };
 
 // JSON API for getting a single poll
 exports.poll = function(req, res) {
+    console.log("index.js:poll");
 	// Poll ID comes in the URL
 	var pollId = req.params.id;
 
@@ -71,28 +72,24 @@ exports.poll = function(req, res) {
 
 // JSON API for creating a new poll
 exports.create = function(req, res) {
+    console.log("index.js:create");
 	var reqBody = req.body;
 
     // Filter out choices with empty text
     var choices = reqBody.choices.filter(function(v) { return v.text != ''; });
 
     // Filter date
-    console.log(moment("30/06/2016").isValid());
-    /*if (!moment("30/06/2016").isValid()) {
-        console.log("HERE IN");
-        var momentdate = moment("30/06/2016", "DD/MM/YYYY");
-        reqBody.enddate = momentdate.format("YYYY-MM-DD");
-    }*/
-    console.log("THERE OUT");
+    reqBody.enddate = isValidDate(reqBody.enddate);
+    if (!reqBody.enddate) {
+        throw 'Error: date is not a valid Date';
+    }
 
     var date = Date.parse(reqBody.enddate);
-    console.log(date.toString());
 
-/*
     // Build up poll object to save
     var pollObj = {
         question: reqBody.question,
-        enddate: Date.parse(reqBody.enddate),
+        enddate: date,
         choices: choices
     };
 
@@ -106,16 +103,15 @@ exports.create = function(req, res) {
 		} else {
 			res.json(doc);
 		}
-	});*/
+	});
 };
 
 exports.vote = function(socket) {
+    console.log("index.js:vote");
 	socket.on('send:vote', function(data) {
-		var ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address;
+		var ip = socket.request.connection.remoteAddress.split(':')[3];
 
-        console.log("SHH: "+socket.handshake.headers['x-forwarded-for']);
-        console.log("SHA: "+socket.handshake.address.address);
-        console.log("SRCRA: "+socket.request.connection.remoteAddress);
+        //console.log("IP: "+ip);
 
 		Poll.findById(data.poll_id, function(err, poll) {
 			var choice = poll.choices.id(data.choice);
@@ -150,3 +146,29 @@ exports.vote = function(socket) {
 		});
 	});
 };
+
+var dateformats = [
+                    'DD/MM/YYYY',
+                    'MM/DD/YYYY',
+                    'YYYY-MM-DD',
+                    'D/M/YYYY',
+                    'DD/MM/YY',
+                    'D/M/YY',
+                    'MM-DD-YYYY',
+                    'DD-MM-YYYY',
+                    'M-D-YY',
+                    'D-M-YY',
+                    'DD-MM-YY',
+                    'MM-DD-YY',
+                    'YY-DD-MM',
+                    'YY-MM-DD',
+                    'YY-D-M',
+                    'YY-M-D'
+                ];
+
+function isValidDate(datestring) {
+    var date = moment(datestring, dateformats, true);
+    if(date == null || !date.isValid()) return false;
+
+    return date.format('YYYY-MM-DD');
+}

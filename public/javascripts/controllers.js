@@ -10,6 +10,7 @@ function PollItemCtrl($scope, $routeParams, socket, Poll) {
 	$scope.poll = Poll.get({pollId: $routeParams.pollId});
 
 	socket.on('myvote', function(data) {
+        console.log("controller.js:myvote");
 		console.dir(data);
 		if(data._id === $routeParams.pollId) {
 			$scope.poll = data;
@@ -17,6 +18,7 @@ function PollItemCtrl($scope, $routeParams, socket, Poll) {
 	});
 
 	socket.on('vote', function(data) {
+        console.log("controller.js:vote");
 		console.dir(data);
 		if(data._id === $routeParams.pollId) {
 			$scope.poll.choices = data.choices;
@@ -25,6 +27,7 @@ function PollItemCtrl($scope, $routeParams, socket, Poll) {
 	});
 
 	$scope.vote = function() {
+        console.log("controller.js:scope:vote");
 		var pollId = $scope.poll._id,
 			choiceId = $scope.poll.userVote;
 
@@ -49,45 +52,79 @@ function PollNewCtrl($scope, $location, Poll) {
 
 	// Method to add an additional choice option
 	$scope.addChoice = function() {
+        console.log("controller.js:addChoice");
 		$scope.poll.choices.push({ text: '' });
 	};
 
 	// Validate and save the new poll to the database
 	$scope.createPoll = function() {
+        console.log("controller.js:createPoll");
 		var poll = $scope.poll;
 
 		// Check that a question was provided
 		if(poll.question.length > 0) {
 			var choiceCount = 0;
 
-			// Loop through the choices, make sure at least two provided
-			for(var i = 0, ln = poll.choices.length; i < ln; i++) {
-				var choice = poll.choices[i];
+            // Check if date is valid
+            if (isValidDate(poll.enddate)) {
 
-				if(choice.text.length > 0) {
-					choiceCount++
-				}
-			}
+                // Loop through the choices, make sure at least two provided
+                for(var i = 0, ln = poll.choices.length; i < ln; i++) {
+                    var choice = poll.choices[i];
 
-			if(choiceCount > 1) {
-				// Create a new poll from the model
-				var newPoll = new Poll(poll);
-				console.log(newPoll);
+                    if(choice.text.length > 0) {
+                        choiceCount++
+                    }
+                }
 
-				// Call API to save poll to the database
-				newPoll.$save(function(p, resp) {
-					if(!p.error) {
-						// If there is no error, redirect to the main view
-						$location.path('polls');
-					} else {
-						alert('Could not create poll');
-					}
-				});
-			} else {
-				alert('You must enter at least two choices');
-			}
+                if(choiceCount > 1) {
+                    // Create a new poll from the model
+                    var newPoll = new Poll(poll);
+                    console.log(newPoll);
+
+                    // Call API to save poll to the database
+                    newPoll.$save(function(p, resp) {
+                        if(!p.error) {
+                            // If there is no error, redirect to the main view
+                            $location.path('polls');
+                        } else {
+                            alert('Impossible de créer un nouveau sondage');
+                        }
+                    });
+                } else {
+                    alert('Vous devez saisir au moins 2 choix');
+                }
+            } else {
+                alert('La date saisie est incorrecte');
+            }
 		} else {
-			alert('You must enter a question');
+			alert('Vous devez saisir une question');
 		}
 	};
+}
+
+var dateformats = [
+                    'DD/MM/YYYY',
+                    'MM/DD/YYYY',
+                    'YYYY-MM-DD',
+                    'D/M/YYYY',
+                    'DD/MM/YY',
+                    'D/M/YY',
+                    'MM-DD-YYYY',
+                    'DD-MM-YYYY',
+                    'M-D-YY',
+                    'D-M-YY',
+                    'DD-MM-YY',
+                    'MM-DD-YY',
+                    'YY-DD-MM',
+                    'YY-MM-DD',
+                    'YY-D-M',
+                    'YY-M-D'
+                ];
+
+function isValidDate(datestring) {
+    var date = moment(datestring, dateformats, true);
+    if(date == null || !date.isValid() || !date.isAfter(moment())) return false;
+
+    return date.format('YYYY-MM-DD');
 }
