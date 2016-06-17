@@ -31,8 +31,13 @@ exports.list = function(req, res) {
 // JSON API for getting a single poll
 exports.poll = function(req, res) {
     console.log("index.js:poll");
+    //console.log("ip: "+req._remoteAddress.split(':')[3]);
+
 	// Poll ID comes in the URL
 	var pollId = req.params.id;
+
+    // Client Ip comes in the request
+    var ip = req._remoteAddress.split(':')[3];
 
 	// Find the poll by its ID, use lean as we won't be changing it
 	Poll.findById(pollId, '', { lean: true }, function(err, poll) {
@@ -50,7 +55,7 @@ exports.poll = function(req, res) {
 					var vote = choice.votes[v];
 					totalVotes++;
 
-					if(vote.ip === (req.header('x-forwarded-for') || req.ip)) {
+					if(vote.ip === ip) {
 						userVoted = true;
 						userChoice = { _id: choice._id, text: choice.text };
 					}
