@@ -1,3 +1,12 @@
+// Controller for the admin section
+/*function AdminCtrl() {
+    console.log("controller.js:admin");
+}
+
+function LoginCtrl() {
+    console.log("controller.js:login");
+}*/
+
 // Controller for the poll list
 function PollListCtrl($scope, Poll) {
     console.log("controller.js:list");
@@ -80,10 +89,12 @@ function PollNewCtrl($scope, $location, Poll) {
                 if(choiceCount > 1) {
                     // Create a new poll from the model
                     var newPoll = new Poll(poll);
-                    console.log(newPoll);
 
                     // Call API to save poll to the database
                     newPoll.$save(function(p, resp) {
+                        console.log(p+" : "+resp);
+                        console.dir(p);
+                        console.dir(resp);
                         if(!p.error) {
                             // If there is no error, redirect to the main view
                             $location.path('polls');

@@ -18,12 +18,39 @@ exports.index = function(req, res) {
 	res.render('index');
 };
 
+// Admin view
+/*
+exports.admin = function(req, res) {
+    console.log("index.js:admin");
+};
+*/
+
+// Admin view
+/*
+exports.login = function(req, res) {
+    console.log("index.js:login");
+    if (req.body.username && req.body.password) {
+        var username = req.body.username;
+        var password = req.body.password;
+
+        if(username == 'demo' && password == 'demo') {
+            req.session.regenerate(function() {
+                req.session.user = username;
+                res.redirect('/admin');
+            });
+        } else {
+           res.redirect('login');
+        }
+    }
+};
+*/
+
 // JSON API for list of polls
 exports.list = function(req, res) {
     console.log("index.js:list");
 	// Query Mongo for polls, just get back the question text
 	Poll.find({}, 'question enddate', function(error, polls) {
-        console.log("Polls: "+JSON.stringify(polls));
+        //console.log("Polls: "+JSON.stringify(polls));
 		res.json(polls);
 	});
 };
@@ -78,6 +105,8 @@ exports.poll = function(req, res) {
 // JSON API for creating a new poll
 exports.create = function(req, res) {
     console.log("index.js:create");
+    //console.log(req);
+    //console.log(res);
 	var reqBody = req.body;
 
     // Filter out choices with empty text
@@ -115,8 +144,6 @@ exports.vote = function(socket) {
     console.log("index.js:vote");
 	socket.on('send:vote', function(data) {
 		var ip = socket.request.connection.remoteAddress.split(':')[3];
-
-        //console.log("IP: "+ip);
 
 		Poll.findById(data.poll_id, function(err, poll) {
 			var choice = poll.choices.id(data.choice);
