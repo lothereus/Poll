@@ -140,6 +140,7 @@ exports.create = function(req, res) {
 	});
 };
 
+// Socket API for saving a vote
 exports.vote = function(socket) {
     console.log("index.js:vote");
 	socket.on('send:vote', function(data) {
