@@ -1,11 +1,5 @@
 // Controller for the admin section
-/*function AdminCtrl() {
-    console.log("controller.js:admin");
-}
 
-function LoginCtrl() {
-    console.log("controller.js:login");
-}*/
 
 // Controller for the poll list
 function PollListCtrl($scope, Poll) {
@@ -92,9 +86,6 @@ function PollNewCtrl($scope, $location, Poll) {
 
                     // Call API to save poll to the database
                     newPoll.$save(function(p, resp) {
-                        console.log(p+" : "+resp);
-                        console.dir(p);
-                        console.dir(resp);
                         if(!p.error) {
                             // If there is no error, redirect to the main view
                             $location.path('polls');

@@ -3,47 +3,30 @@ var package = require('../package.json');
 var moment = require('moment');
 moment.locale(package.locale);
 
+// Require passport
+var passport = require('./middle/passport').passport;
+//var secret = require('../secret.json').secret;
+
+// Require JWT
+//var jwt = require('express-jwt');
+//var auth = jwt({secret: secret, userProperty: 'payload'});
+
 // Connect to MongoDB using Mongoose
-var mongoose = require('mongoose');
-var db;
-db = mongoose.createConnection('localhost', 'pollsapp');
+var mongoose = require('./middle/mongoose').mongoose;
 
 // Get Poll schema and model
 var PollSchema = require('../models/Poll.js').PollSchema;
-var Poll = db.model('polls', PollSchema);
+var Poll = mongoose.model('polls', PollSchema);
+
+// Get User schema and model
+var UserSchema = require('../models/User.js').UserSchema;
+var User = mongoose.model('users', UserSchema);
 
 // Main application view
 exports.index = function(req, res) {
     console.log("index.js:index");
 	res.render('index');
 };
-
-// Admin view
-/*
-exports.admin = function(req, res) {
-    console.log("index.js:admin");
-};
-*/
-
-// Admin view
-/*
-exports.login = function(req, res) {
-    console.log("index.js:login");
-    if (req.body.username && req.body.password) {
-        var username = req.body.username;
-        var password = req.body.password;
-
-        if(username == 'demo' && password == 'demo') {
-            req.session.regenerate(function() {
-                req.session.user = username;
-                res.redirect('/admin');
-            });
-        } else {
-           res.redirect('login');
-        }
-    }
-};
-*/
 
 // JSON API for list of polls
 exports.list = function(req, res) {
@@ -105,8 +88,7 @@ exports.poll = function(req, res) {
 // JSON API for creating a new poll
 exports.create = function(req, res) {
     console.log("index.js:create");
-    //console.log(req);
-    //console.log(res);
+
 	var reqBody = req.body;
 
     // Filter out choices with empty text
@@ -139,6 +121,48 @@ exports.create = function(req, res) {
 		}
 	});
 };
+
+// JSON API for creating a new user
+exports.register = function(req, res, next) {
+    console.log("index.js:register");
+
+    var reqBody = req.body;
+
+    if(!reqBody.username || !reqBody.password){
+        return res.status(400).json({message: 'Please fill out all fields'});
+    }
+
+    var user = new User();
+
+    user.username = reqBody.username;
+    user.setPassword(reqBody.password);
+
+    user.save(function (err){
+        if(err){ return next(err); }
+        return res.json({token: user.generateJWT()})
+    });
+}
+
+// JSON API for logging user
+exports.login = function(req, res, next) {
+    console.log("index.js:login");
+
+    var reqBody = req.body;
+
+    if(!reqBody.username || !reqBody.password){
+        return res.status(400).json({message: 'Please fill out all fields'});
+    }
+
+    passport.authenticate('local', function(err, user, info){
+        if(err){ return next(err); }
+
+        if(user){
+            return res.json({token: user.generateJWT()});
+        } else {
+            return res.status(401).json(info);
+        }
+    })(req, res, next);
+}
 
 // Socket API for saving a vote
 exports.vote = function(socket) {

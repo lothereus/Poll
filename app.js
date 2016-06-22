@@ -10,6 +10,7 @@ var logger = require('morgan');
 var methodOverride = require('method-override');
 var bodyParser = require('body-parser');
 var multer = require('multer');
+var passport = require('./middle/passport').passport;
 var session = require('express-session');
 
 // Set moment for date manipulation
@@ -30,6 +31,7 @@ app.use(methodOverride());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(multer());
+app.use(passport.initialize());
 app.use(session({
   secret: 'the best witcher',
   resave: false,
@@ -53,27 +55,14 @@ app.use(function(err, req, res, next) {
 
 // Main App Page
 app.get('/', routes.index);
-//app.get('*', routes.index);
 
 // MongoDB API Routes
 app.get('/polls/polls', routes.list);
 app.get('/polls/:id', routes.poll);
 app.post('/polls', routes.create);
 app.post('/vote', routes.vote);
-
-// Admin Section Routes
-//app.get('/admin', restrict, routes.admin);
-//app.get('/login', routes.login);
-//app.post('/login', routes.connect);
-
-function restrict(req, res, next) {
-    if (req.session.user) {
-        next();
-    } else {
-        req.session.error = 'Accès refusé !';
-        res.redirect('/login');
-    }
-}
+app.post('/register', routes.register);
+app.post('/login', routes.login);
 
 io.sockets.on('connection', routes.vote);
 
