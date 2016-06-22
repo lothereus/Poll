@@ -1,4 +1,4 @@
-var mongoose = require('../middle/mongoose');
+var mongoose = require('../middle/mongoose').mongoose;
 
 // Subdocument schema for votes
 var voteSchema = new mongoose.Schema({ ip: 'String' });

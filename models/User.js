@@ -1,4 +1,4 @@
-var mongoose = require('../middle/mongoose');
+var mongoose = require('../middle/mongoose').mongoose;
 
 var UserSchema = new mongoose.Schema({
     username: {type: String, lowercase: true, unique: true},
