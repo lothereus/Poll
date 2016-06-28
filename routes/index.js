@@ -4,7 +4,7 @@ var moment = require('moment');
 moment.locale(package.locale);
 
 // Require passport
-var passport = require('./middle/passport').passport;
+var passport = require('../middle/passport').passport;
 //var secret = require('../secret.json').secret;
 
 // Require JWT
@@ -12,7 +12,7 @@ var passport = require('./middle/passport').passport;
 //var auth = jwt({secret: secret, userProperty: 'payload'});
 
 // Connect to MongoDB using Mongoose
-var mongoose = require('./middle/mongoose').mongoose;
+var mongoose = require('../middle/mongoose').mongoose;
 
 // Get Poll schema and model
 var PollSchema = require('../models/Poll.js').PollSchema;

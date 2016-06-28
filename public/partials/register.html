@@ -1,12 +1,12 @@
 <div class="page-header">
-    <h1>Se connecter</h1>
+    <h1>Créer un utilisateur</h1>
 </div>
 
 <div ng-show="error" class="alert alert-danger row">
     <span>{{ error.message }}</span>
 </div>
 
-<form role="form" ng-submit="logIn()">
+<form role="form" ng-submit="register()">
     <div class="form-group">
         <label for="userName">Login</label>
         <input type="text" ng-model="user.username" class="form-control" id="userName" placeholder="Pseudo">
@@ -24,7 +24,7 @@
             <a href="#/polls" class="btn btn-default" role="button"><span class="glyphicon glyphicon-arrow-left"></span> Retour aux sondages</a>
         </div>
         <div class="col-xs-6">
-            <button class="btn btn-primary pull-right" type="submit">Connexion &raquo;</button>
+            <button class="btn btn-primary pull-right" type="submit">Créer &raquo;</button>
         </div>
     </div>
 

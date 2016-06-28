@@ -17,10 +17,17 @@ html(lang='en', ng-app='polls')
         script(src='/javascripts/filters.js')
         script(src='/javascripts/services.js')
         script(src='/javascripts/controllers.js')
-    body(ng-controller="PollListCtrl")
-        nav.navbar.navbar-inverse.navbar-fixed-top(role='navigation')
+    body(ng-controller='PollListCtrl')
+        nav.navbar.navbar-inverse.navbar-fixed-top(role='navigation', ng-controller='PollNavCtrl')
             div.navbar-header
                 a.navbar-brand(href='#/polls') Sondages
-                a.navbar-brand(href='#/admin') Admin
+            div.navbar-collapse.collapse
+                ul.nav.navbar-nav.navbar-right
+                    li(ng-show='isLoggedIn()')
+                        a(href='#/admin') Admin
+                    li(ng-show='isLoggedIn()')
+                        a(href='' ng-click='logOut()') Logout
+                    li(ng-hide='isLoggedIn()')
+                        a(href='#/login') Login
         div.container
             div(ng-view)

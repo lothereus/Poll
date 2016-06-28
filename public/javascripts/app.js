@@ -5,8 +5,10 @@ angular.module('polls', ['pollServices']).
 			when('/polls', { templateUrl: 'partials/list.html', controller: PollListCtrl }).
 			when('/poll/:pollId', { templateUrl: 'partials/item.html', controller: PollItemCtrl }).
 			when('/new', { templateUrl: 'partials/new.html', controller: PollNewCtrl }).
-            //when('/admin', { templateUrl: 'partials/admin.html', controller: AdminCtrl }).
-            //when('/login', { templateUrl: 'partials/login.html', controller: LoginCtrl }).
+            when('/register', { templateUrl: 'partials/register.html', controller: PollAuthCtrl }).
+            when('/login', { templateUrl: 'partials/login.html', controller: PollAuthCtrl }).
+            when('/admin', { templateUrl: 'partials/admin.html', controller: PollAdminCtrl }).
+
 			// If invalid route, just redirect to the main list view
 			otherwise({ redirectTo: '/polls' });
 	}]);

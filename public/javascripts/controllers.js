@@ -1,10 +1,52 @@
 // Controller for the admin section
+function PollAdminCtrl($scope, $location, Auth, Poll) {
+    console.log("controller.js:admin");
+    if(!Auth.isLoggedIn()) {
+        console.log("Not logged in, back to home");
+        $location.path('polls');
+    }
+	//$scope.polls = Poll.query();
+}
 
+// Controller for the NavBar
+function PollNavCtrl($scope, Auth) {
+    $scope.isLoggedIn = Auth.isLoggedIn;
+    $scope.currentUser = Auth.currentUser;
+    $scope.logOut = Auth.logOut;
+}
+
+// Controller for the admin section
+function PollAuthCtrl($scope, $location, Auth) {  //$state
+    console.log("controller.js:auth");
+    $scope.user = {};
+
+    if(Auth.isLoggedIn()){
+        $location.path('polls');
+    }
+
+    $scope.register = function() {
+        Auth.register($scope.user).error(function(error) {
+            $scope.error = error;
+        }).then(function() {
+            //$state.go('home');
+            $location.path('polls');
+        });
+    };
+
+    $scope.logIn = function() {
+        Auth.logIn($scope.user).error(function(error) {
+            $scope.error = error;
+        }).then(function() {
+            $location.path('polls');
+        });
+    };
+}
 
 // Controller for the poll list
-function PollListCtrl($scope, Poll) {
+function PollListCtrl($scope, Poll, Auth) {
     console.log("controller.js:list");
 	$scope.polls = Poll.query();
+    $scope.isLoggedIn = Auth.isLoggedIn;
 }
 
 // Controller for an individual poll

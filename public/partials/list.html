@@ -2,19 +2,20 @@
     <h1>Liste des sondages</h1>
 </div>
 <div class="row">
-    <div class="col-xs-5">
+    <div class="col-xs-5" ng-show="isLoggedIn()">
         <a href="#/new" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Nouveau Sondage</a>
     </div>
-    <div class="col-xs-7">
+    <!--<div class="col-xs-7">
         <input type="text" class="form-control" ng-model="query" placeholder="Search for a poll">
-    </div>
+    </div>-->
 </div>
-<div class="row">
+<div class="row" ng-show="isLoggedIn()">
     <div class="col-xs-12"><hr></div>
 </div>
 <div class="row" ng-switch on="polls.length">
     <ul ng-switch-when="0">
-        <li><em>Aucun sondage pour le moment. Voulez-vous en <a href="#/new">ajouter un</a> ?</em></li>
+        <li ng-hide="isLoggedIn()"><em>Aucun sondage pour le moment.</em></li>
+        <li ng-show="isLoggedIn()"><em>Aucun sondage pour le moment. Voulez-vous en <a href="#/new">ajouter un</a> ?</em></li>
     </ul>
     <ul ng-switch-default>
         <li ng-repeat="poll in polls | filter:query">
