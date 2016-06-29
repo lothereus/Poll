@@ -57,7 +57,8 @@ app.use(function(err, req, res, next) {
 app.get('/', routes.index);
 
 // MongoDB API Routes
-app.get('/polls/polls', routes.list);
+app.get('/polls/all', routes.all);
+app.get('/polls/active', routes.active);
 app.get('/polls/:id', routes.poll);
 app.post('/polls', routes.create);
 app.post('/vote', routes.vote);

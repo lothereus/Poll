@@ -28,14 +28,21 @@ exports.index = function(req, res) {
 	res.render('index');
 };
 
-// JSON API for list of polls
-exports.list = function(req, res) {
-    console.log("index.js:list");
-	// Query Mongo for polls, just get back the question text
-	Poll.find({}, 'question enddate', function(error, polls) {
+// JSON API for list of all polls
+exports.all = function(req, res) {
+    console.log("index.js:all");
+	Poll.findAll(function(error, polls) {
         //console.log("Polls: "+JSON.stringify(polls));
 		res.json(polls);
 	});
+};
+
+// JSON API for list of active polls
+exports.active = function(req, res) {
+    console.log("index.js:active");
+    Poll.findActive(function(error, polls) {
+        res.json(polls);
+    });
 };
 
 // JSON API for getting a single poll

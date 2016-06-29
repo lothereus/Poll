@@ -1,5 +1,10 @@
 var mongoose = require('../middle/mongoose').mongoose;
 
+// Set moment for date manipulation
+var package = require('../package.json');
+var moment = require('moment');
+moment.locale(package.locale);
+
 // Subdocument schema for votes
 var voteSchema = new mongoose.Schema({ ip: 'String' });
 
@@ -15,6 +20,21 @@ var PollSchema = new mongoose.Schema({
 	enddate: { type: Date, required: true, min: Date.now },
 	choices: [choiceSchema]
 });
+
+PollSchema.statics.findAll = function (callback) {
+    return this.find()
+            .sort('enddate')
+            .exec(callback);
+};
+
+PollSchema.statics.findActive = function (callback) {
+    var now = moment().startOf('day').toISOString();
+    return this.find()
+            .select('question enddate')
+            .gte('enddate', now)
+            .sort('enddate')
+            .exec(callback);
+};
 
 mongoose.model('Poll', PollSchema);
 exports.PollSchema = PollSchema;

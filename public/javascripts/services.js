@@ -2,10 +2,9 @@
 angular.module('pollServices', ['ngResource']).
 	factory('Poll', function($resource) {
         return $resource('polls/:pollId', {}, {
-		//return $resource('polls/polls', {}, {
 			// Use this method for getting a list of polls
-			query: { method: 'GET', params: { pollId: 'polls' }, isArray: true }
-            //query: { method: 'GET', isArray: true }
+			active: { method: 'GET', params: { pollId: 'active' }, isArray: true },
+            all: { method: 'GET', params: { pollId: 'all' }, isArray: true }
 		})
 	}).
     factory('Auth', function($http, $window) {

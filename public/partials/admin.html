@@ -1,3 +1,25 @@
 <div class="page-header">
     <h1>Admin</h1>
 </div>
+<div class="row">
+    <div class="col-xs-5" ng-show="isLoggedIn()">
+        <a href="#/new" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Nouveau Sondage</a>
+    </div>
+</div>
+<div class="row" ng-show="isLoggedIn()">
+    <div class="col-xs-12"><hr></div>
+</div>
+<div class="row" ng-switch on="polls.length">
+    <ul ng-switch-when="0">
+        <li><em>Aucun sondage pour le moment. Voulez-vous en <a href="#/new">ajouter un</a> ?</em></li>
+    </ul>
+    <ul ng-switch-default>
+        <li ng-repeat="poll in polls | filter:query">
+            <div class="col-xs-8"><a href="#/poll/{{poll._id}}">{{poll.question}}</a></div>
+            <div class="col-xs-1 right"><a href="#/result/{{poll._id}}">résultats</a></div>
+            <div class="col-xs-1 right">fin:</div>
+            <div class="col-xs-2 right">{{poll.enddate | moment:'LL'}}</div>
+        </li>
+    </ul>
+</div>
+<p>&nbsp;</p>

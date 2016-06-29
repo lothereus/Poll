@@ -5,7 +5,7 @@ function PollAdminCtrl($scope, $location, Auth, Poll) {
         console.log("Not logged in, back to home");
         $location.path('polls');
     }
-	//$scope.polls = Poll.query();
+	$scope.polls = Poll.all();
 }
 
 // Controller for the NavBar
@@ -45,7 +45,7 @@ function PollAuthCtrl($scope, $location, Auth) {  //$state
 // Controller for the poll list
 function PollListCtrl($scope, Poll, Auth) {
     console.log("controller.js:list");
-	$scope.polls = Poll.query();
+	$scope.polls = Poll.active();
     $scope.isLoggedIn = Auth.isLoggedIn;
 }
 
