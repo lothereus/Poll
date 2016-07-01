@@ -61,7 +61,6 @@ angular.module('pollServices', ['ngResource']).
         return {
             on: function (eventName, callback) {
                 socket.on(eventName, function () {
-                    console.log(eventName+" happen");
                     var args = arguments;
                     $rootScope.$apply(function () {
                         callback.apply(socket, args);
@@ -70,7 +69,6 @@ angular.module('pollServices', ['ngResource']).
             },
             emit: function (eventName, data, callback) {
                 socket.emit(eventName, data, function () {
-                    console.log(eventName+" emitted");
                     var args = arguments;
                     $rootScope.$apply(function () {
                         if (callback) {

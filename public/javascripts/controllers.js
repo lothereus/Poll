@@ -65,8 +65,6 @@ function PollItemCtrl($scope, $routeParams, socket, Poll) {
 
 	socket.on('myvote', function(data) {
         console.log("controller.js:myvote");
-        alert(data);
-        console.dir(data);
 		if(data._id === $routeParams.pollId) {
 			$scope.poll = data;
 		}
@@ -74,8 +72,6 @@ function PollItemCtrl($scope, $routeParams, socket, Poll) {
 
 	socket.on('vote', function(data) {
         console.log("controller.js:vote");
-        alert(data);
-        console.dir(data);
 		if(data._id === $routeParams.pollId) {
 			$scope.poll.choices = data.choices;
 			$scope.poll.totalVotes = data.totalVotes;

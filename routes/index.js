@@ -181,7 +181,7 @@ exports.vote = function(socket) {
 		Poll.findById(data.poll_id, function(err, poll) {
             var choice = {};
             for(ch in data.choices) {
-                choice = poll.choices.id(ch);
+                choice = poll.choices.id(data.choices[ch]);
                 if(choice.votes.indexOf({ ip: ip }) == -1) {
                     choice.votes.push({ ip: ip });
                 }
@@ -207,6 +207,7 @@ exports.vote = function(socket) {
 						var vote = choice.votes[j];
 						theDoc.totalVotes++;
 						theDoc.ip = ip;
+                        theDoc.userChoices = [];
 
 						if(vote.ip === ip) {
 							theDoc.userNbVotes++;
