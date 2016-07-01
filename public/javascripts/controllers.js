@@ -84,8 +84,14 @@ function PollItemCtrl($scope, $routeParams, socket, Poll) {
 
 	$scope.vote = function() {
         console.log("controller.js:scope:vote");
-		var pollId = $scope.poll._id,
-			choices = $scope.poll.userVotes;
+		var pollId = $scope.poll._id;
+
+        var choices = [];
+        if(angular.isArray($scope.poll.userVotes)) {
+            choices = $scope.poll.userVotes;
+        } else {
+			choices = [$scope.poll.userVotes];
+        }
 
         if(choices.length <= $scope.poll.maxvote) {
             if(choices) {
