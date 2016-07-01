@@ -59,8 +59,8 @@ exports.poll = function(req, res) {
 	// Find the poll by its ID, use lean as we won't be changing it
 	Poll.findById(pollId, '', { lean: true }, function(err, poll) {
 		if(poll) {
-			var userVoted = false,
-                userChoice,
+			var userNbVotes = 0,
+                userChoices = [],
                 totalVotes = 0;
 
 			// Loop through poll choices to determine if user has voted
@@ -73,15 +73,15 @@ exports.poll = function(req, res) {
 					totalVotes++;
 
 					if(vote.ip === ip) {
-						userVoted = true;
-						userChoice = { _id: choice._id, text: choice.text };
+						userNbVotes++;
+						userChoices.push(choice._id);
 					}
 				}
 			}
 
 			// Attach info about user's past voting on this poll
-			poll.userVoted = userVoted;
-			poll.userChoice = userChoice;
+			poll.userNbVotes = userNbVotes;
+			poll.userChoices = userChoices;
 
 			poll.totalVotes = totalVotes;
 
@@ -113,7 +113,8 @@ exports.create = function(req, res) {
     var pollObj = {
         question: reqBody.question,
         enddate: date,
-        choices: choices
+        choices: choices,
+        maxvote: reqBody.maxvote
     };
 
 	// Create poll model from built up poll object
@@ -178,13 +179,23 @@ exports.vote = function(socket) {
 		var ip = socket.request.connection.remoteAddress.split(':')[3];
 
 		Poll.findById(data.poll_id, function(err, poll) {
-			var choice = poll.choices.id(data.choice);
-			choice.votes.push({ ip: ip });
+            var choice = {};
+            for(ch in data.choices) {
+                choice = poll.choices.id(ch);
+                if(choice.votes.indexOf({ ip: ip }) == -1) {
+                    choice.votes.push({ ip: ip });
+                }
+            }
 
 			poll.save(function(err, doc) {
 				var theDoc = {
-					question: doc.question, _id: doc._id, choices: doc.choices,
-					userVoted: false, totalVotes: 0
+					question: doc.question,
+                    _id: doc._id,
+                    choices: doc.choices,
+                    maxvote: doc.maxvote,
+                    enddate: doc.enddate,
+					userNbVotes: 0,
+                    totalVotes: 0
 				};
 
 				// Loop through poll choices to determine if user has voted
@@ -198,8 +209,8 @@ exports.vote = function(socket) {
 						theDoc.ip = ip;
 
 						if(vote.ip === ip) {
-							theDoc.userVoted = true;
-							theDoc.userChoice = { _id: choice._id, text: choice.text };
+							theDoc.userNbVotes++;
+							theDoc.userChoices.push(choice._id);
 						}
 					}
 				}

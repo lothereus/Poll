@@ -5,7 +5,16 @@ function PollAdminCtrl($scope, $location, Auth, Poll) {
         console.log("Not logged in, back to home");
         $location.path('polls');
     }
-	$scope.polls = Poll.all();
+    var polls = Poll.all(function() {
+        for(var p = 0, ln = polls.length; p < ln; p++) {
+            if(moment(polls[p].enddate).isBefore(moment(), 'day')) {
+                polls[p].ended = true;
+            } else {
+                polls[p].ended = false;
+            }
+        }
+    });
+	$scope.polls = polls;
 }
 
 // Controller for the NavBar
@@ -18,6 +27,7 @@ function PollNavCtrl($scope, Auth) {
 // Controller for the admin section
 function PollAuthCtrl($scope, $location, Auth) {  //$state
     console.log("controller.js:auth");
+
     $scope.user = {};
 
     if(Auth.isLoggedIn()){
@@ -28,7 +38,6 @@ function PollAuthCtrl($scope, $location, Auth) {  //$state
         Auth.register($scope.user).error(function(error) {
             $scope.error = error;
         }).then(function() {
-            //$state.go('home');
             $location.path('polls');
         });
     };
@@ -56,7 +65,8 @@ function PollItemCtrl($scope, $routeParams, socket, Poll) {
 
 	socket.on('myvote', function(data) {
         console.log("controller.js:myvote");
-		console.dir(data);
+        alert(data);
+        console.dir(data);
 		if(data._id === $routeParams.pollId) {
 			$scope.poll = data;
 		}
@@ -64,7 +74,8 @@ function PollItemCtrl($scope, $routeParams, socket, Poll) {
 
 	socket.on('vote', function(data) {
         console.log("controller.js:vote");
-		console.dir(data);
+        alert(data);
+        console.dir(data);
 		if(data._id === $routeParams.pollId) {
 			$scope.poll.choices = data.choices;
 			$scope.poll.totalVotes = data.totalVotes;
@@ -74,25 +85,34 @@ function PollItemCtrl($scope, $routeParams, socket, Poll) {
 	$scope.vote = function() {
         console.log("controller.js:scope:vote");
 		var pollId = $scope.poll._id,
-			choiceId = $scope.poll.userVote;
+			choices = $scope.poll.userVotes;
 
-		if(choiceId) {
-			var voteObj = { poll_id: pollId, choice: choiceId };
-			socket.emit('send:vote', voteObj);
-		} else {
-			alert('You must select an option to vote for');
-		}
+        if(choices.length <= $scope.poll.maxvote) {
+            if(choices) {
+                var voteObj = { poll_id: pollId, choices: choices };
+                socket.emit('send:vote', voteObj);
+            } else {
+                alert('Vous devez sélectionner au moins un choix');
+            }
+        } else {
+            alert('Vous ne pouvez sélectionner que '+$scope.poll.maxvote+' choix');
+        }
 	};
 }
 
 // Controller for creating a new poll
-function PollNewCtrl($scope, $location, Poll) {
+function PollNewCtrl($scope, $location, Auth, Poll) {
     console.log("controller.js:new");
+    if(!Auth.isLoggedIn()) {
+        console.log("Not logged in, back to home");
+        $location.path('polls');
+    }
 	// Define an empty poll model object
 	$scope.poll = {
 		question: '',
 		enddate: '',
-		choices: [ { text: '' }, { text: '' }, { text: '' }]
+		choices: [ { text: '' }, { text: '' }, { text: '' }],
+        maxvote: 0
 	};
 
 	// Method to add an additional choice option
@@ -111,7 +131,7 @@ function PollNewCtrl($scope, $location, Poll) {
 			var choiceCount = 0;
 
             // Check if date is valid
-            if (isValidDate(poll.enddate)) {
+            if(isValidDate(poll.enddate)) {
 
                 // Loop through the choices, make sure at least two provided
                 for(var i = 0, ln = poll.choices.length; i < ln; i++) {
@@ -123,18 +143,27 @@ function PollNewCtrl($scope, $location, Poll) {
                 }
 
                 if(choiceCount > 1) {
-                    // Create a new poll from the model
-                    var newPoll = new Poll(poll);
+                    // Check max vote
+                    if(poll.maxvote > 0) {
+                        if(poll.maxvote <= choiceCount) {
+                            // Create a new poll from the model
+                            var newPoll = new Poll(poll);
 
-                    // Call API to save poll to the database
-                    newPoll.$save(function(p, resp) {
-                        if(!p.error) {
-                            // If there is no error, redirect to the main view
-                            $location.path('polls');
+                            // Call API to save poll to the database
+                            newPoll.$save(function(p, resp) {
+                                if(!p.error) {
+                                    // If there is no error, redirect to the main view
+                                    $location.path('polls');
+                                } else {
+                                    alert('Impossible de créer un nouveau sondage');
+                                }
+                            });
                         } else {
-                            alert('Impossible de créer un nouveau sondage');
+                            alert('Le nombre maximum de vote ne peux être supérieur au nombre de choix');
                         }
-                    });
+                    } else {
+                        alert('Le nombre maximum de vote doit être au minimum de 1');
+                    }
                 } else {
                     alert('Vous devez saisir au moins 2 choix');
                 }

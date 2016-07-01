@@ -1,23 +1,49 @@
 body {
-  padding-top: 50px;
+    padding-top: 50px;
 }
 
 .tab-content .lead {
-	margin-top: 20px;
+    margin-top: 20px;
 }
 
 .result-table {
-	margin: 20px 0;
-	width: 100%;
-	border-collapse: collapse;
+    margin: 20px 0;
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .result-table td {
-	padding: 8px;
+    padding: 8px;
 }
 
 .result-table > tbody > tr > td:first-child {
-	width: 25%;
-	max-width: 300px;
-	text-align: right;
+    width: 25%;
+    max-width: 300px;
+    text-align: right;
+}
+
+.voting-table {
+    margin: 20px 0;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.voting-table td {
+    padding: 8px;
+}
+
+.voting-table > tbody > tr > td:first-child {
+    width: 5%;
+    max-width: 300px;
+    text-align: right;
+}
+
+.endedpoll {
+    color: red;
+    font-weight: bold;
+}
+
+.currentpoll {
+    color: green;
+    font-weight: bold;
 }

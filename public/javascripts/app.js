@@ -12,6 +12,3 @@ angular.module('polls', ['pollServices']).
 			// If invalid route, just redirect to the main list view
 			otherwise({ redirectTo: '/polls' });
 	}]);
-
-
-

@@ -12,6 +12,11 @@
         <label for="pollEndDate">Date de fin</label>
         <input type="date" ng-model="poll.enddate" class="form-control" id="pollEndDate" placeholder="Saisir la date de fin (jj/mm/aaaa)">
     </div>
+    
+    <div class="form-group">
+        <label for="pollMaxVote">Nombre max de vote par personne pour le sondage</label>
+        <input type="number" min="1" ng-model="poll.maxvote" class="form-control" id="pollMaxVote" placeholder="Saisir un nombre de votes (max: 1 vote par choix)">
+    </div>
 
     <div class="form-group">
         <label>Choix</label>

@@ -5,50 +5,72 @@
 	<strong>Question</strong><br>{{poll.question}}
 </div>
 
-<div ng-hide="poll.userVoted">
-	<p class="lead">Faites votre choix:</p>
+<div ng-hide="poll.userNbVotes >= poll.maxvote">
+    <p class="lead">Faites votre choix:</p>
+    <form role="form" ng-submit="vote()">
+        <div id="formcontainer" ng-switch on="poll.maxvote">
+            <div id="radio_version" ng-switch-when="1">
+                <div ng-repeat="choice in poll.choices" class="radio">
+                    <label>
+                        <input type="radio" name="choice" ng-model="poll.userVotes" value="{{choice._id}}">
+                        {{choice.text}}
+                    </label>
+                </div>
+            </div>
+            <div id="checkbox_version" ng-switch-default>
+                <table class="voting-table">
+                    <tr ng-repeat="choice in poll.choices">
+                        <td>
+                            <input id="choice_{{choice._id}}" type="checkbox" ng-checked="poll.userChoices.indexOf(choice._id)>-1" ng-disabled="poll.userChoices.indexOf(choice._id)>-1" checklist-model="poll.userVotes" checklist-value="choice._id">
+                        </td>
+                        <td class="checkbox">
+                            <label for="choice_{{choice._id}}">
+                                {{choice.text}}
+                            </label>
+                        </td>
+                        <td>
+                            <table style="background-color: lightblue; width: {{choice.votes.length/poll.totalVotes*100}}%; text-align: right">
+                                    <tr><td>{{choice.votes.length}}</td></tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
 
-	<form role="form" ng-submit="vote()">
-		<div ng-repeat="choice in poll.choices" class="radio">
-			<label>
-				<input type="radio" name="choice" ng-model="poll.userVote" value="{{choice._id}}">
-				{{choice.text}}
-			</label>
-		</div>
-		<p><hr></p>
-		<div class="row">
-			<div class="col-xs-6">
-				<a href="#/polls" class="btn btn-default" role="button"><span class="glyphicon glyphicon-arrow-left"></span> Retour aux sondages</a>
-			</div>
-			<div class="col-xs-6">
-				<button class="btn btn-primary pull-right" type="submit">Voter &raquo;</button>
-			</div>
-		</div>
-	</form>
+        <p><hr></p>
+        <div class="row">
+            <div class="col-xs-6">
+                <a href="#/polls" class="btn btn-default" role="button"><span class="glyphicon glyphicon-arrow-left"></span> Retour aux sondages</a>
+            </div>
+            <div class="col-xs-6">
+                <button class="btn btn-primary pull-right" type="submit">Voter &raquo;</button>
+            </div>
+        </div>
+    </form>
 </div>
 	
-<div ng-show="poll.userVoted">
-	<table class="result-table">
-		<tr ng-repeat="choice in poll.choices">
-			<td>{{choice.text}}</td>
-			<td>
-				<table style="background-color: lightblue; width: {{choice.votes.length/poll.totalVotes*100}}%; text-align: right">
-					<tr><td>{{choice.votes.length}}</td></tr>
-				</table>
-			</td>
-		</tr>
-	</table>
-			
-	<p>
-		<em>
-			{{poll.totalVotes}} votes.
-			<span ng-show="poll.userChoice">Vous avez voté <strong>{{poll.userChoice.text}}</strong>.</span>
-		</em>
-	</p>
-	
-	<p><hr></p>
-	
-	<p><a href="#/polls" class="btn btn-default" role="button"><span class="glyphicon glyphicon-arrow-left"></span> Retour aux sondages</a></p>
+<div ng-show="poll.userNbVotes >= poll.maxvote">
+    <table class="result-table">
+        <tr ng-repeat="choice in poll.choices">
+            <td>{{choice.text}}</td>
+            <td>
+                <table style="background-color: lightblue; width: {{choice.votes.length/poll.totalVotes*100}}%; text-align: right">
+                    <tr><td>{{choice.votes.length}}</td></tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        <em>
+            {{poll.totalVotes}} votes.
+        </em>
+    </p>
+
+    <p><hr></p>
+
+    <p><a href="#/polls" class="btn btn-default" role="button"><span class="glyphicon glyphicon-arrow-left"></span> Retour aux sondages</a></p>
 </div>
 
 <p>&nbsp;</p>

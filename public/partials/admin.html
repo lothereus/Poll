@@ -14,9 +14,13 @@
         <li><em>Aucun sondage pour le moment. Voulez-vous en <a href="#/new">ajouter un</a> ?</em></li>
     </ul>
     <ul ng-switch-default>
-        <li ng-repeat="poll in polls | filter:query">
-            <div class="col-xs-8"><a href="#/poll/{{poll._id}}">{{poll.question}}</a></div>
-            <div class="col-xs-1 right"><a href="#/result/{{poll._id}}">résultats</a></div>
+        <li ng-repeat="poll in polls">
+            <div class="col-xs-8">
+                <a ng-class="{'endedpoll': poll.ended}" href="#/poll/{{poll._id}}">{{poll.question}}</a>
+            </div>
+            <div class="col-xs-1 right">
+                <a href="#/result/{{poll._id}}">résultats</a>
+            </div>
             <div class="col-xs-1 right">fin:</div>
             <div class="col-xs-2 right">{{poll.enddate | moment:'LL'}}</div>
         </li>
