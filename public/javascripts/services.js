@@ -7,6 +7,9 @@ angular.module('pollServices', ['ngResource']).
             all: { method: 'GET', params: { pollId: 'all' }, isArray: true }
 		})
 	}).
+    factory('Result', function($resource) {
+        return $resource('result/:pollId')
+	}).
     factory('Auth', function($http, $window) {
         var Auth = {};
 

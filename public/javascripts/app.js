@@ -8,6 +8,7 @@ angular.module('polls', ['pollServices']).
             when('/register', { templateUrl: 'partials/register.html', controller: PollAuthCtrl }).
             when('/login', { templateUrl: 'partials/login.html', controller: PollAuthCtrl }).
             when('/admin', { templateUrl: 'partials/admin.html', controller: PollAdminCtrl }).
+            when('/result/:pollId', { templateUrl: 'partials/result.html', controller: PollResultCtrl }).
 
 			// If invalid route, just redirect to the main list view
 			otherwise({ redirectTo: '/polls' });

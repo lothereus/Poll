@@ -14,15 +14,21 @@
         <li><em>Aucun sondage pour le moment. Voulez-vous en <a href="#/new">ajouter un</a> ?</em></li>
     </ul>
     <ul ng-switch-default>
-        <li ng-repeat="poll in polls">
-            <div class="col-xs-8">
+        <li class="list-unstyled">
+            <div class="col-xs-7">Question</div>
+            <div class="col-xs-3">Action</div>
+            <div class="col-xs-2">Fin</div>
+        </li>
+        <li class="list-inline" ng-repeat="poll in polls">
+            <div class="col-xs-7">
                 <a ng-class="{'endedpoll': poll.ended}" href="#/poll/{{poll._id}}">{{poll.question}}</a>
             </div>
-            <div class="col-xs-1 right">
+            <div class="col-xs-3">
                 <a href="#/result/{{poll._id}}">résultats</a>
+                &nbsp;-&nbsp;
+                <a href="#/clone/{{poll._id}}">cloner</a>
             </div>
-            <div class="col-xs-1 right">fin:</div>
-            <div class="col-xs-2 right">{{poll.enddate | moment:'LL'}}</div>
+            <div class="col-xs-2">{{poll.enddate | moment:'LL'}}</div>
         </li>
     </ul>
 </div>

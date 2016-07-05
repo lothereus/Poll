@@ -60,6 +60,7 @@ app.get('/', routes.index);
 app.get('/polls/all', routes.all);
 app.get('/polls/active', routes.active);
 app.get('/polls/:id', routes.poll);
+app.get('/result/:id', routes.result);
 app.post('/polls', routes.create);
 app.post('/vote', routes.vote);
 app.post('/register', routes.register);

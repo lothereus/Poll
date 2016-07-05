@@ -92,6 +92,35 @@ exports.poll = function(req, res) {
 	});
 };
 
+// JSON API for getting a single poll
+exports.result = function(req, res) {
+    console.log("index.js:result");
+
+	// Poll ID comes in the URL
+	var pollId = req.params.id;
+
+	// Find the poll by its ID, use lean as we won't be changing it
+	Poll.findById(pollId, '', { lean: true }, function(err, poll) {
+		if(poll) {
+			var totalVotes = 0;
+
+			for(c in poll.choices) {
+                poll.choices[c].totalVotes = 0;
+				for(v in poll.choices[c].votes) {
+					poll.choices[c].totalVotes++;
+					totalVotes++;
+				}
+			}
+            poll.choices = sortByKey(poll.choices, 'totalVotes', true);
+			poll.totalVotes = totalVotes;
+
+			res.json(poll);
+		} else {
+			res.json({error:true});
+		}
+	});
+};
+
 // JSON API for creating a new poll
 exports.create = function(req, res) {
     console.log("index.js:create");
@@ -178,9 +207,12 @@ exports.vote = function(socket) {
 	socket.on('send:vote', function(data) {
 		var ip = socket.request.connection.remoteAddress.split(':')[3];
 
+        console.dir(data);
+
 		Poll.findById(data.poll_id, function(err, poll) {
             var choice = {};
             for(ch in data.choices) {
+                // TO CHECK !
                 choice = poll.choices.id(data.choices[ch]);
                 if(choice.votes.indexOf({ ip: ip }) == -1) {
                     choice.votes.push({ ip: ip });
@@ -195,7 +227,9 @@ exports.vote = function(socket) {
                     maxvote: doc.maxvote,
                     enddate: doc.enddate,
 					userNbVotes: 0,
-                    totalVotes: 0
+                    totalVotes: 0,
+                    ip: ip,
+                    userChoices: []
 				};
 
 				// Loop through poll choices to determine if user has voted
@@ -206,8 +240,6 @@ exports.vote = function(socket) {
 					for(var j = 0, jLn = choice.votes.length; j < jLn; j++) {
 						var vote = choice.votes[j];
 						theDoc.totalVotes++;
-						theDoc.ip = ip;
-                        theDoc.userChoices = [];
 
 						if(vote.ip === ip) {
 							theDoc.userNbVotes++;
@@ -247,4 +279,15 @@ function isValidDate(datestring) {
     if(date == null || !date.isValid()) return false;
 
     return date.format('YYYY-MM-DD');
+}
+
+function sortByKey(array, key, revert) {
+    return array.sort(function(a, b) {
+        var x = a[key]; var y = b[key];
+        if(revert) {
+            return ((x > y) ? -1 : ((x < y) ? 1 : 0));
+        } else {
+            return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+        }
+    });
 }

@@ -1,0 +1,37 @@
+<div class="page-header">
+    <h1>Résultats</h1>
+</div>
+
+<div class="well well-lg">
+    <strong>Question</strong><br>{{result.question}}
+</div>
+
+<div ng-show="result.ended">
+    <a href="randomize()" class="btn btn-default" role="button">
+        <span class="glyphicon glyphicon-repeat"></span>&nbsp;
+    </a>
+   
+</div>
+
+<div>
+    <table class="result-table">
+        <tr ng-repeat="choice in result.choices">
+            <td>{{choice.text}}</td>
+            <td>
+                <table style="background-color: lightblue; width: {{choice.votes.length/result.totalVotes*100}}%; text-align: right">
+                    <tr><td>{{choice.votes.length}}</td></tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        <em>
+            {{result.totalVotes}} votes.
+        </em>
+    </p>
+
+    <p><hr></p>
+
+    <p><a href="#/admin" class="btn btn-default" role="button"><span class="glyphicon glyphicon-arrow-left"></span> Retour à l'admin</a></p>
+</div>

@@ -59,12 +59,30 @@ function PollListCtrl($scope, Poll, Auth) {
 }
 
 // Controller for an individual poll
+function PollResultCtrl($scope, $routeParams, Result, Auth) {
+    console.log("controller.js:result");
+    if(!Auth.isLoggedIn()) {
+        console.log("Not logged in, back to home");
+        $location.path('polls');
+    }
+    var result = Result.get({pollId: $routeParams.pollId}, function() {
+        if(moment(result.enddate).isBefore(moment(), 'day')) {
+            result.ended = true;
+        } else {
+            result.ended = false;
+        }
+    });
+	$scope.result = result;
+}
+
+// Controller for an individual poll
 function PollItemCtrl($scope, $routeParams, socket, Poll) {
     console.log("controller.js:item");
 	$scope.poll = Poll.get({pollId: $routeParams.pollId});
 
 	socket.on('myvote', function(data) {
         console.log("controller.js:myvote");
+        console.dir(data);
 		if(data._id === $routeParams.pollId) {
 			$scope.poll = data;
 		}

@@ -18,8 +18,15 @@
         <li ng-show="isLoggedIn()"><em>Aucun sondage pour le moment. Voulez-vous en <a href="#/new">ajouter un</a> ?</em></li>
     </ul>
     <ul ng-switch-default>
-        <li ng-repeat="poll in polls">
-            <div class="col-xs-6"><a href="#/poll/{{poll._id}}">{{poll.question}}</a></div><div class="col-xs-6"> - fin: {{poll.enddate | moment:'LL'}}</div>
+        <li class="list-unstyled">
+            <div class="col-xs-8">Question</div>
+            <div class="col-xs-4">Fin</div>
+        </li>
+        <li class="list-inline" ng-repeat="poll in polls">
+            <div class="col-xs-8">
+                <a ng-class="{'endedpoll': poll.ended}" href="#/poll/{{poll._id}}">{{poll.question}}</a>
+            </div>
+            <div class="col-xs-4">{{poll.enddate | moment:'LL'}}</div>
         </li>
     </ul>
 </div>
