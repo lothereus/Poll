@@ -6,7 +6,7 @@ var moment = require('moment');
 moment.locale(package.locale);
 
 // Subdocument schema for votes
-var voteSchema = new mongoose.Schema({ ip: 'String' });
+var voteSchema = new mongoose.Schema({ ip: String });
 
 // Subdocument schema for poll choices
 var choiceSchema = new mongoose.Schema({
@@ -14,12 +14,15 @@ var choiceSchema = new mongoose.Schema({
 	votes: [voteSchema]
 });
 
+// Subdocumen schema for poll result
+var resultSchema = new mongoose.Schema({ text: String });
+
 // Document schema for polls
 var PollSchema = new mongoose.Schema({
 	question: { type: String, required: true },
 	enddate: { type: Date, required: true, min: Date.now },
     maxvote: { type: Number, required: true, default: 1 },
-    result: { type: String },
+    result: resultSchema,
 	choices: [choiceSchema]
 });
 

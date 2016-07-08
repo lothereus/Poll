@@ -112,6 +112,31 @@ exports.result = function(req, res) {
 				}
 			}
             poll.choices = sortByKey(poll.choices, 'totalVotes', true);
+
+            if(!poll.result && moment(poll.enddate).isBefore(moment(), 'day')) {
+                // Determine the result if the Poll is ended
+                var best = [];
+                for (i = 0; i <= 4; i++) {
+                    best.push(poll.choices[i]);
+                }
+                var result = best[Math.floor(Math.random() * best.length)];
+                poll.result = {
+                    text: result.text,
+                    _id: result._id
+                }
+                Poll.update({_id: poll._id}, {$set: {result: poll.result}}, function(err) {
+                    if(err) { throw err; }
+                });
+            } else {
+                poll.result = false;
+            }
+
+            if(moment(poll.enddate).isBefore(moment(), 'day')) {
+                poll.ended = true;
+            } else {
+                poll.ended = false;
+            }
+
 			poll.totalVotes = totalVotes;
 
 			res.json(poll);

@@ -65,13 +65,7 @@ function PollResultCtrl($scope, $routeParams, Result, Auth) {
         console.log("Not logged in, back to home");
         $location.path('polls');
     }
-    var result = Result.get({pollId: $routeParams.pollId}, function() {
-        if(moment(result.enddate).isBefore(moment(), 'day')) {
-            result.ended = true;
-        } else {
-            result.ended = false;
-        }
-    });
+    var result = Result.get({pollId: $routeParams.pollId});
 	$scope.result = result;
 }
 
