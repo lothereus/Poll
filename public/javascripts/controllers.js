@@ -66,7 +66,8 @@ function PollResultCtrl($scope, $routeParams, Result, Auth) {
         $location.path('polls');
     }
     var result = Result.get({pollId: $routeParams.pollId});
-	$scope.result = result;
+    console.dir(result);
+	$scope.poll = result;
 }
 
 // Controller for an individual poll

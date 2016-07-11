@@ -67,9 +67,11 @@ exports.poll = function(req, res) {
 			// on this poll, and if so, what they selected
 			for(c in poll.choices) {
 				var choice = poll.choices[c];
+                poll.choices[c].totalVotes = 0;
 
 				for(v in choice.votes) {
 					var vote = choice.votes[v];
+                    poll.choices[c].totalVotes++;
 					totalVotes++;
 
 					if(vote.ip === ip) {
@@ -78,6 +80,8 @@ exports.poll = function(req, res) {
 					}
 				}
 			}
+
+            poll.choices = sortByKey(poll.choices, 'totalVotes', true);
 
 			// Attach info about user's past voting on this poll
 			poll.userNbVotes = userNbVotes;
@@ -113,22 +117,24 @@ exports.result = function(req, res) {
 			}
             poll.choices = sortByKey(poll.choices, 'totalVotes', true);
 
-            if(!poll.result && moment(poll.enddate).isBefore(moment(), 'day')) {
-                // Determine the result if the Poll is ended
-                var best = [];
-                for (i = 0; i <= 4; i++) {
-                    best.push(poll.choices[i]);
+            if(!poll.result) {
+                if(moment(poll.enddate).isBefore(moment(), 'day')) {
+                    // Determine the result if the Poll is ended
+                    var best = [];
+                    for (i = 0; i <= 4; i++) {
+                        best.push(poll.choices[i]);
+                    }
+                    var result = best[Math.floor(Math.random() * best.length)];
+                    poll.result = {
+                        text: result.text,
+                        _id: result._id
+                    }
+                    Poll.update({_id: poll._id}, {$set: {choices: poll.choices, result: poll.result}}, function(err) {
+                        if(err) { throw err; }
+                    });
+                } else {
+                   poll.result = false;
                 }
-                var result = best[Math.floor(Math.random() * best.length)];
-                poll.result = {
-                    text: result.text,
-                    _id: result._id
-                }
-                Poll.update({_id: poll._id}, {$set: {result: poll.result}}, function(err) {
-                    if(err) { throw err; }
-                });
-            } else {
-                poll.result = false;
             }
 
             if(moment(poll.enddate).isBefore(moment(), 'day')) {
@@ -232,8 +238,6 @@ exports.vote = function(socket) {
 	socket.on('send:vote', function(data) {
 		var ip = socket.request.connection.remoteAddress.split(':')[3];
 
-        console.dir(data);
-
 		Poll.findById(data.poll_id, function(err, poll) {
             var choice = {};
             for(ch in data.choices) {
@@ -243,6 +247,14 @@ exports.vote = function(socket) {
                     choice.votes.push({ ip: ip });
                 }
             }
+
+            for(c in poll.choices) {
+                poll.choices[c].totalVotes = 0;
+				for(v in poll.choices[c].votes) {
+					poll.choices[c].totalVotes++;
+				}
+			}
+            poll.choices = sortByKey(poll.choices, 'totalVotes', true);
 
 			poll.save(function(err, doc) {
 				var theDoc = {

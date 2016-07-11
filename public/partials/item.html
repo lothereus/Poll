@@ -37,8 +37,15 @@
                 </table>
             </div>
         </div>
+        
+        <p>
+            <em>
+                {{poll.totalVotes}} votes. {{poll.maxvote}} vote(s) par personne maximum.
+            </em>
+        </p>
 
         <p><hr></p>
+        
         <div class="row">
             <div class="col-xs-6">
                 <a href="#/polls" class="btn btn-default" role="button"><span class="glyphicon glyphicon-arrow-left"></span> Retour aux sondages</a>
@@ -64,7 +71,7 @@
 
     <p>
         <em>
-            {{poll.totalVotes}} votes.
+            {{poll.totalVotes}} votes. {{poll.maxvote}} vote(s) par personne maximum.
         </em>
     </p>
 

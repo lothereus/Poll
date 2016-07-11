@@ -3,7 +3,9 @@
 </div>
 
 <div class="well well-lg">
-    <strong>Question</strong><br>{{result.question}}
+    <strong>Question:</strong>&nbsp;<span>{{poll.question}}</span>
+    <br>
+    <strong>Résultat:</strong>&nbsp;<span ng-show="poll.result">{{poll.result.text}}</span><span ng-hide="poll.result">-</span>
 </div>
 
 <!--<div ng-show="result.ended">
@@ -14,10 +16,10 @@
 
 <div>
     <table class="result-table">
-        <tr ng-repeat="choice in result.choices">
+        <tr ng-repeat="choice in poll.choices">
             <td>{{choice.text}}</td>
             <td>
-                <table style="background-color: lightblue; width: {{choice.votes.length/result.totalVotes*100}}%; text-align: right">
+                <table style="background-color: lightblue; width: {{choice.votes.length/poll.totalVotes*100}}%; text-align: right">
                     <tr><td>{{choice.votes.length}}</td></tr>
                 </table>
             </td>
@@ -26,7 +28,7 @@
 
     <p>
         <em>
-            {{result.totalVotes}} votes.
+            {{poll.totalVotes}} votes. <span ng-show="poll.result">Résultat : {{poll.result.text}}</span>
         </em>
     </p>
 
