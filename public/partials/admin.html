@@ -15,14 +15,14 @@
     </ul>
     <ul ng-switch-default>
         <li class="list-unstyled">
-            <div class="col-xs-5">Question</div>
-            <div class="col-xs-3">Résultat</div>
-            <div class="col-xs-2">Action</div>
-            <div class="col-xs-2">Fin</div>
+            <div class="col-xs-5 text-center text-success">Question</div>
+            <div class="col-xs-3 text-center text-success">Résultat</div>
+            <div class="col-xs-2 text-center text-success">Action</div>
+            <div class="col-xs-2 text-center text-success">Fin</div>
         </li>
         <li class="list-inline" ng-repeat="poll in polls">
             <div class="col-xs-5">
-                <a ng-class="{'endedpoll': poll.ended}" href="#/poll/{{poll._id}}">{{poll.question}}</a>
+                <span ng-class="{'endedpoll': poll.ended}">{{poll.question}}</span>
             </div>
             <div class="col-xs-3">
                 <span ng-show="!poll.result">non calculé</span>

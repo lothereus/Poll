@@ -8,6 +8,8 @@
     <strong>Résultat:</strong>&nbsp;<span ng-show="poll.result">{{poll.result.text}}</span><span ng-hide="poll.result">-</span>
 </div>
 
+<p><a href="#/admin" class="btn btn-default" role="button"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;Retour à l'admin</a>&nbsp;<a ng-click="clone()" class="btn btn-default" role="button"><span class="glyphicon glyphicon-share"></span>&nbsp;Cloner sans le résultat</a></p>
+
 <!--<div ng-show="result.ended">
     <a href="randomize()" class="btn btn-default" role="button">
         <span class="glyphicon glyphicon-repeat"></span>Recalcul
@@ -34,5 +36,5 @@
 
     <p><hr></p>
 
-    <p><a href="#/admin" class="btn btn-default" role="button"><span class="glyphicon glyphicon-arrow-left"></span> Retour à l'admin</a></p>
+    <p><a href="#/admin" class="btn btn-default" role="button"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;Retour à l'admin</a></p>
 </div>

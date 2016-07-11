@@ -121,7 +121,7 @@ exports.result = function(req, res) {
                 if(moment(poll.enddate).isBefore(moment(), 'day')) {
                     // Determine the result if the Poll is ended
                     var best = [];
-                    for (i = 0; i <= 4; i++) {
+                    for (i = 0; i <= (poll.type - 1); i++) {
                         best.push(poll.choices[i]);
                     }
                     var result = best[Math.floor(Math.random() * best.length)];
@@ -167,11 +167,13 @@ exports.create = function(req, res) {
         throw 'Error: date is not a valid Date';
     }
 
+    // Check date
     var date = Date.parse(reqBody.enddate);
 
     // Build up poll object to save
     var pollObj = {
         question: reqBody.question,
+        type: reqBody.type,
         enddate: date,
         choices: choices,
         maxvote: reqBody.maxvote
@@ -312,8 +314,11 @@ var dateformats = [
                 ];
 
 function isValidDate(datestring) {
-    var date = moment(datestring, dateformats, true);
-    if(date == null || !date.isValid()) return false;
+    var date = moment(datestring);
+    if(date == null || !date.isValid()) {
+        date = moment(datestring, dateformats, true);
+        if(date == null || !date.isValid()) return false;
+    }
 
     return date.format('YYYY-MM-DD');
 }

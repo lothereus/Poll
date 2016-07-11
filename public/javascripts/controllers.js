@@ -59,15 +59,39 @@ function PollListCtrl($scope, Poll, Auth) {
 }
 
 // Controller for an individual poll
-function PollResultCtrl($scope, $routeParams, Result, Auth) {
+function PollResultCtrl($scope, $routeParams, $location, Result, Auth, Poll) {
     console.log("controller.js:result");
     if(!Auth.isLoggedIn()) {
         console.log("Not logged in, back to home");
         $location.path('polls');
     }
     var result = Result.get({pollId: $routeParams.pollId});
-    console.dir(result);
+
 	$scope.poll = result;
+
+    $scope.clone = function() {
+        var newPoll = new Poll($scope.poll);
+        delete newPoll._id;
+        if(newPoll.result) {
+            for(c in newPoll.choices) {
+                if(newPoll.choices[c]._id == newPoll.result._id) {
+                    delete newPoll.choices[c];
+                }
+            }
+            delete newPoll.result;
+        }
+        newPoll.enddate = moment().add(7, 'days');
+
+        // Call API to save poll to the database
+        newPoll.$save(function(p, resp) {
+            if(!p.error) {
+                // If there is no error, redirect to the main view
+                $location.path('polls');
+            } else {
+                alert('Impossible de créer un nouveau sondage');
+            }
+        });
+    };
 }
 
 // Controller for an individual poll
@@ -122,6 +146,7 @@ function PollNewCtrl($scope, $location, Auth, Poll) {
         console.log("Not logged in, back to home");
         $location.path('polls');
     }
+
 	// Define an empty poll model object
 	$scope.poll = {
 		question: '',
@@ -140,6 +165,8 @@ function PollNewCtrl($scope, $location, Auth, Poll) {
 	$scope.createPoll = function() {
         console.log("controller.js:createPoll");
 		var poll = $scope.poll;
+
+        console.dir(poll);
 
 		// Check that a question was provided
 		if(poll.question.length > 0) {
@@ -161,18 +188,22 @@ function PollNewCtrl($scope, $location, Auth, Poll) {
                     // Check max vote
                     if(poll.maxvote > 0) {
                         if(poll.maxvote <= choiceCount) {
-                            // Create a new poll from the model
-                            var newPoll = new Poll(poll);
+                            if(poll.type == 1 || (choiceCount >= 6 && poll.type == 3) || (choiceCount >= 10 && poll.type == 5)) {
+                                // Create a new poll from the model
+                                var newPoll = new Poll(poll);
 
-                            // Call API to save poll to the database
-                            newPoll.$save(function(p, resp) {
-                                if(!p.error) {
-                                    // If there is no error, redirect to the main view
-                                    $location.path('polls');
-                                } else {
-                                    alert('Impossible de créer un nouveau sondage');
-                                }
-                            });
+                                // Call API to save poll to the database
+                                newPoll.$save(function(p, resp) {
+                                    if(!p.error) {
+                                        // If there is no error, redirect to the main view
+                                        $location.path('polls');
+                                    } else {
+                                        alert('Impossible de créer un nouveau sondage');
+                                    }
+                                });
+                            } else {
+                                alert('Le nombre de choix ne correspond pas au type de sondage');
+                            }
                         } else {
                             alert('Le nombre maximum de vote ne peux être supérieur au nombre de choix');
                         }
@@ -211,8 +242,11 @@ var dateformats = [
                 ];
 
 function isValidDate(datestring) {
-    var date = moment(datestring, dateformats, true);
-    if(date == null || !date.isValid() || !date.isAfter(moment())) return false;
+    var date = moment(datestring);
+    if(date == null || !date.isValid()) {
+        date = moment(datestring, dateformats, true);
+        if(date == null || !date.isValid()) return false;
+    }
 
     return date.format('YYYY-MM-DD');
 }

@@ -20,6 +20,7 @@ var resultSchema = new mongoose.Schema({ text: String });
 // Document schema for polls
 var PollSchema = new mongoose.Schema({
 	question: { type: String, required: true },
+    type: { type: Number, required: true, default: 1 },
 	enddate: { type: Date, required: true, min: Date.now },
     maxvote: { type: Number, required: true, default: 1 },
     result: resultSchema,
