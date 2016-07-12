@@ -84,7 +84,7 @@ function PollResultCtrl($scope, $routeParams, $location, Result, Auth, Poll) {
         newPoll.$save(function(p, resp) {
             if(!p.error) {
                 // If there is no error, redirect to the main view
-                $location.path('polls');
+                $location.path('admin');
             } else {
                 alert('Impossible de créer un nouveau sondage');
             }
