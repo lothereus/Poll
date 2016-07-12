@@ -65,9 +65,7 @@ function PollResultCtrl($scope, $routeParams, $location, Result, Auth, Poll) {
         console.log("Not logged in, back to home");
         $location.path('polls');
     }
-    var result = Result.get({pollId: $routeParams.pollId});
-
-	$scope.poll = result;
+    $scope.poll = Result.get({pollId: $routeParams.pollId});
 
     $scope.clone = function() {
         var newPoll = new Poll($scope.poll);
@@ -92,6 +90,37 @@ function PollResultCtrl($scope, $routeParams, $location, Result, Auth, Poll) {
             }
         });
     };
+}
+
+// Controller for the poll edition
+function PollEditCtrl($scope, $routeParams, $location, socket, Edit, Auth) {
+    console.log("controller.js:edit");
+    if(!Auth.isLoggedIn()) {
+        console.log("Not logged in, back to home");
+        $location.path('polls');
+    }
+    $scope.poll = Edit.get({pollId: $routeParams.pollId});
+
+    $scope.save = function() {
+        console.log("controller.js:edit:save");
+        var editObj = {
+                poll_id: $scope.poll._id,
+                question: $scope.poll.question,
+                enddate: null
+            };
+
+        if (isValidDate($scope.poll.enddate)) {
+            editObj.enddate = $scope.poll.enddate;
+
+            socket.emit('send:save', editObj, function(message) {
+                if (message == 'saved') { alert('Modifications sauvegardées'); }
+                else { alert("Une erreur s'est produite"); }
+                $location.path('polls');
+            });
+        } else {
+            alert('La date saisie est incorrecte');
+        }
+    }
 }
 
 // Controller for an individual poll
@@ -242,9 +271,9 @@ var dateformats = [
                 ];
 
 function isValidDate(datestring) {
-    var date = moment(datestring);
+    var date = moment(datestring, dateformats, true);
     if(date == null || !date.isValid()) {
-        date = moment(datestring, dateformats, true);
+        date = moment(datestring);
         if(date == null || !date.isValid()) return false;
     }
 

@@ -211,7 +211,7 @@ exports.register = function(req, res, next) {
         if(err){ return next(err); }
         return res.json({token: user.generateJWT()})
     });
-}
+};
 
 // JSON API for logging user
 exports.login = function(req, res, next) {
@@ -232,66 +232,93 @@ exports.login = function(req, res, next) {
             return res.status(401).json(info);
         }
     })(req, res, next);
-}
+};
 
-// Socket API for saving a vote
-exports.vote = function(socket) {
-    console.log("index.js:vote");
-	socket.on('send:vote', function(data) {
-		var ip = socket.request.connection.remoteAddress.split(':')[3];
-
-		Poll.findById(data.poll_id, function(err, poll) {
-            var choice = {};
-            for(ch in data.choices) {
-                // TO CHECK !
-                choice = poll.choices.id(data.choices[ch]);
-                if(choice.votes.indexOf({ ip: ip }) == -1) {
-                    choice.votes.push({ ip: ip });
-                }
-            }
-
-            for(c in poll.choices) {
-                poll.choices[c].totalVotes = 0;
-				for(v in poll.choices[c].votes) {
-					poll.choices[c].totalVotes++;
-				}
-			}
-            poll.choices = sortByKey(poll.choices, 'totalVotes', true);
-
-			poll.save(function(err, doc) {
-				var theDoc = {
-					question: doc.question,
-                    _id: doc._id,
-                    choices: doc.choices,
-                    maxvote: doc.maxvote,
-                    enddate: doc.enddate,
-					userNbVotes: 0,
-                    totalVotes: 0,
-                    ip: ip,
-                    userChoices: []
-				};
-
-				// Loop through poll choices to determine if user has voted
-				// on this poll, and if so, what they selected
-				for(var i = 0, ln = doc.choices.length; i < ln; i++) {
-					var choice = doc.choices[i];
-
-					for(var j = 0, jLn = choice.votes.length; j < jLn; j++) {
-						var vote = choice.votes[j];
-						theDoc.totalVotes++;
-
-						if(vote.ip === ip) {
-							theDoc.userNbVotes++;
-							theDoc.userChoices.push(choice._id);
-						}
-					}
-				}
-
-				socket.emit('myvote', theDoc);
-				socket.broadcast.emit('vote', theDoc);
-			});
-		});
+exports.edit = function(req, res) {
+    console.log("index.js:edit");
+    Poll.findById(req.params.id, 'question enddate', { lean: true }, function(err, poll) {
+		if(poll) {
+            poll.enddate = moment(poll.enddate).format('DD/MM/YYYY');
+			res.json(poll);
+		} else {
+			res.json({error:true});
+		}
 	});
+};
+
+// Socket API for saving a vote or saving edited poll
+exports.socket = function(socket) {
+    console.log("index.js:socket");
+    socket
+        .on('send:save', function(data, callback) {
+            // Filter date
+            data.enddate = isValidDate(data.enddate);
+            if (!data.enddate) {
+                throw 'Error: date is not a valid Date';
+            }
+            var date = Date.parse(data.enddate);
+
+            Poll.update({_id: data.poll_id}, {$set: {question: data.question, enddate: date}}, function(err) {
+                if(err) { callback('error'); throw err; }
+                callback('saved');
+            });
+        })
+        .on('send:vote', function(data) {
+            console.log("index.js:socket:vote");
+            var ip = socket.request.connection.remoteAddress.split(':')[3];
+
+            Poll.findById(data.poll_id, function(err, poll) {
+                var choice = {};
+                for(ch in data.choices) {
+                    // TO CHECK !
+                    choice = poll.choices.id(data.choices[ch]);
+                    if(choice.votes.indexOf({ ip: ip }) == -1) {
+                        choice.votes.push({ ip: ip });
+                    }
+                }
+
+                for(c in poll.choices) {
+                    poll.choices[c].totalVotes = 0;
+                    for(v in poll.choices[c].votes) {
+                        poll.choices[c].totalVotes++;
+                    }
+                }
+                poll.choices = sortByKey(poll.choices, 'totalVotes', true);
+
+                poll.save(function(err, doc) {
+                    var theDoc = {
+                        question: doc.question,
+                        _id: doc._id,
+                        choices: doc.choices,
+                        maxvote: doc.maxvote,
+                        enddate: doc.enddate,
+                        userNbVotes: 0,
+                        totalVotes: 0,
+                        ip: ip,
+                        userChoices: []
+                    };
+
+                    // Loop through poll choices to determine if user has voted
+                    // on this poll, and if so, what they selected
+                    for(var i = 0, ln = doc.choices.length; i < ln; i++) {
+                        var choice = doc.choices[i];
+
+                        for(var j = 0, jLn = choice.votes.length; j < jLn; j++) {
+                            var vote = choice.votes[j];
+                            theDoc.totalVotes++;
+
+                            if(vote.ip === ip) {
+                                theDoc.userNbVotes++;
+                                theDoc.userChoices.push(choice._id);
+                            }
+                        }
+                    }
+
+                    socket.emit('myvote', theDoc);
+                    socket.broadcast.emit('vote', theDoc);
+                });
+            });
+        });
 };
 
 var dateformats = [
@@ -314,9 +341,9 @@ var dateformats = [
                 ];
 
 function isValidDate(datestring) {
-    var date = moment(datestring);
+    var date = moment(datestring, dateformats, true);
     if(date == null || !date.isValid()) {
-        date = moment(datestring, dateformats, true);
+        date = moment(datestring);
         if(date == null || !date.isValid()) return false;
     }
 

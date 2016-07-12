@@ -7,6 +7,9 @@ angular.module('pollServices', ['ngResource']).
             all: { method: 'GET', params: { pollId: 'all' }, isArray: true }
 		})
 	}).
+    factory('Edit', function($resource) {
+        return $resource('edit/:pollId')
+    }).
     factory('Result', function($resource) {
         return $resource('result/:pollId')
 	}).

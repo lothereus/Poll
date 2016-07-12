@@ -61,13 +61,14 @@ app.get('/polls/all', routes.all);
 app.get('/polls/active', routes.active);
 app.get('/polls/:id', routes.poll);
 app.get('/result/:id', routes.result);
+app.get('/edit/:id', routes.edit);
 app.post('/polls', routes.create);
 app.post('/result', routes.create);
-app.post('/vote', routes.vote);
+app.post('/socket', routes.socket);
 app.post('/register', routes.register);
 app.post('/login', routes.login);
 
-io.sockets.on('connection', routes.vote);
+io.sockets.on('connection', routes.socket);
 
 server.listen(app.get('port'), function(){
     console.log('Express server listening on port ' + app.get('port'));

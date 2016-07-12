@@ -29,10 +29,10 @@
                 <span ng-hide="!poll.result">{{poll.result.text}}</span>
             </div>
             <div class="col-xs-2">
+                <a href="#/edit/{{poll._id}}" ng-show="!poll.ended">Editer</a>
+                <span ng-show="!poll.ended">&nbsp;-&nbsp;</span> 
                 <a href="#/result/{{poll._id}}" ng-show="!poll.ended">Résultat actuel</a>
                 <a href="#/result/{{poll._id}}" ng-hide="!poll.ended">Résultat final</a>
-                <!--&nbsp;-&nbsp;
-                <a href="#/clone/{{poll._id}}">cloner</a>-->
             </div>
             <div class="col-xs-2">{{poll.enddate | moment:'LL'}}</div>
         </li>
